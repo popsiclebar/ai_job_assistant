@@ -1,0 +1,46 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Personal and generated data
+data/
+uploads/
+private/
+generated/
+exports/
+*.pdf
+*.docx
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+
+# Editors and operating systems
+.DS_Store
+.idea/
+.vscode/
+.agents/
+*.swp
+
+# Logs and local databases
+*.log
+*.sqlite
+*.sqlite3
