@@ -9,12 +9,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
 from app.core.config import get_settings
+from app.database.session import close_database
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     """Provide one place for application startup and shutdown resources."""
     yield
+    await close_database()
 
 
 settings = get_settings()

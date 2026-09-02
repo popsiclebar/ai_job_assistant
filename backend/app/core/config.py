@@ -22,8 +22,12 @@ class Settings(BaseSettings):
     app_host: str = "127.0.0.1"
     app_port: int = 8000
     frontend_origin: str = "http://localhost:3000"
+    database_url: str = (
+        "postgresql+asyncpg://ai_job_assistant:change-me@localhost:5433/ai_job_assistant"
+    )
     jobtech_base_url: str = "https://jobsearch.api.jobtechdev.se"
     jobtech_timeout_seconds: float = Field(default=20.0, gt=0, le=60)
+    jobtech_api_key: str | None = None
 
 
 @lru_cache

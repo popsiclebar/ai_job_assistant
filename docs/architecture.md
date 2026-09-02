@@ -32,6 +32,16 @@ An individual fit evaluation receives the selected job description directly and 
 
 Both domains may later share chunking, embedding, PostgreSQL full-text search, and pgvector infrastructure.
 
+## Job persistence
+
+Job data is divided by responsibility:
+
+- `raw_job_postings` retains the latest complete payload and publication date for each source identity.
+- `jobs` holds deduplicated, source-independent fields used for filtering and evaluation.
+- `applications` holds the user's status and application-specific documents.
+
+Each raw posting belongs to at most one canonical job, while one canonical job may collect listings from several sources. Source identity is enforced by `(source, source_job_id)`; cross-source matching remains conservative so uncertain advertisements are not merged.
+
 ## Future extraction
 
 If agent workloads become long-running or require separate scaling, an agent worker can be added as another runtime entry point using the same backend package. A separate service should only be introduced when deployment, scaling, isolation, or ownership requirements justify it.

@@ -1,33 +1,24 @@
-"""Exposes read-only job discovery endpoints.
-The initial route delegates JobTech transport while normalization is built next."""
-
-from typing import Any
+"""Exposes the user-initiated job discovery endpoint.
+The route validates HTTP input and delegates provider work to the search service."""
 
 import httpx
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, HTTPException, status
+from pydantic import ValidationError
 
 from app.core.config import get_settings
-from app.integrations.jobtech.client import JobTechClient
+from app.schemas.jobs import JobSearchRequest, JobSearchResponse
+from app.services.job_search import search_jobtech_jobs
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 
 
-@router.get("/search")
-async def search_jobs(
-    q: str = Query(min_length=1, max_length=200),
-    limit: int = Query(default=10, ge=1, le=100),
-    offset: int = Query(default=0, ge=0),
-) -> dict[str, Any]:
-    """Search JobTech with validated query and pagination parameters."""
-    settings = get_settings()
+@router.post("/search", response_model=JobSearchResponse)
+async def search_jobs(search_request: JobSearchRequest) -> JobSearchResponse:
+    """Return one normalized page of live JobTech advertisements."""
     try:
-        async with JobTechClient(
-            base_url=settings.jobtech_base_url,
-            timeout_seconds=settings.jobtech_timeout_seconds,
-        ) as client:
-            return await client.search(q=q, limit=limit, offset=offset)
-    except httpx.HTTPError as exc:
+        return await search_jobtech_jobs(search_request, get_settings())
+    except (httpx.HTTPError, ValidationError) as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="JobTech is temporarily unavailable.",
+            detail="JobTech did not return a usable response.",
         ) from exc

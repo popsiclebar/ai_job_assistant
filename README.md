@@ -29,10 +29,13 @@ Use `.env.example` as the configuration template.
 Backend:
 
 ```bash
+cp .env.example .env
+docker compose up -d postgres
 cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-dev.txt
+alembic upgrade head
 uvicorn app.main:app --reload
 ```
 

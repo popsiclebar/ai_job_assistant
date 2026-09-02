@@ -1,0 +1,24 @@
+# Runs the project-owned PostgreSQL service used during local development.
+# The backend remains on the host while database data persists in a named Docker volume.
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: ai-job-assistant-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ai_job_assistant}
+      POSTGRES_USER: ${POSTGRES_USER:-ai_job_assistant}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the ignored .env file}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - ai_job_assistant_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  ai_job_assistant_postgres_data:
